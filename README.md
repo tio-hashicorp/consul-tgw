@@ -1,19 +1,21 @@
 # consul-tgw
+Flow:
+web (port 6060) -> web-proxy -> terminating-gateway -> api (port 6061)
 
-# Run Consul server
+## Run Consul server
 $ consul agent -dev
 
-# Run Services
+## Run Services
 $ run-web.sh
 $ run-api.sh
 
-# Register Services
+## Register Services
 $ consul services register web.hcl
 $ consul connect envoy -sidecar-for web -- -l debug > /tmp/web-proxy.log 2>&1 &
 
 $ consul services register api-v1.hcl
 
-# Register and Run Terminating Gateway
+## Register and Run Terminating Gateway
 $ consul config write terminating-gateway.hcl
 $ consul connect envoy -gateway=terminating \
    -register \
@@ -21,7 +23,7 @@ $ consul connect envoy -gateway=terminating \
    -service terminating-gateway \
    -address '{{ GetInterfaceIP "eth0" }}:8443' -- -l debug >  /tmp/tgw.log 2>&1 &
    
-# Test the service
+## Test the service
 $ curl -v localhost:6060
 or
 $ From browser, type localhost:6060/ui
